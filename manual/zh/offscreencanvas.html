@@ -53,16 +53,11 @@
 main();
 </pre>
 <p>需要注意的是 worker 不能访问 <code class="notranslate" translate="no">DOM</code>。它们无法看到 HTML 元素，也无法接收鼠标事件或者键盘事件。。它们通常唯一能做的是响应发送给它们的消息，以及将消息发送回页面。</p>
-<p>要向 worker 发送消息，我们可以调用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> and
-pass it 1 or 2 arguments. The first argument is a JavaScript object
-that will be <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">cloned</a> 
-and sent to the worker. The second argument is an optional array
-of objects that are part of the first object that we want <em>transferred</em>
-to the worker. These objects will not be cloned. Instead they will be <em>transferred</em>
-and will cease to exist in the main page. Cease to exist is the probably
-the wrong description, rather they are neutered. Only certain types of
-objects can be transferred instead of cloned. They include <code class="notranslate" translate="no">OffscreenCanvas</code>
-so once transferred the <code class="notranslate" translate="no">offscreen</code> object back in the main page is useless.</p>
+<p>要向 worker 发送消息，我们可以调用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Worker/postMessage"><code class="notranslate" translate="no">worker.postMessage</code></a> 向其传递 1 个或 2 个参数。第一个参数是一个 JavaScript 对象，会被 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm">克隆</a> 
+  后发送给 worker。第二个参数是一个可选的对象数组，它们是在第一个参数中我们想要 <em>转移</em>
+  给 worker 的对象，这些对象不会被克隆，而是会被 <em>转移</em>
+  且不再存在于主页面中。不再存在这个描述可能不太准确，更确切地说是被阉割了。只有某些类型的对象可以被转移而不是克隆，其中包括 <code class="notranslate" translate="no">OffscreenCanvas</code>
+  所以一旦被转移了，再回到主页面的 <code class="notranslate" translate="no">offscreen</code> 对象也是不可用的。</p>
 <p>Workers receive messages from their <code class="notranslate" translate="no">onmessage</code> handler. The object
 we passed to <code class="notranslate" translate="no">postMessage</code> arrives on <code class="notranslate" translate="no">event.data</code> passed to the <code class="notranslate" translate="no">onmessage</code>
 handler on the worker. The code above declares a <code class="notranslate" translate="no">type: 'main'</code> in the object it passes
