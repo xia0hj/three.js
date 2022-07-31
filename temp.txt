@@ -1,0 +1,40 @@
+OffscreenCanvas 是一个相对较新的浏览器功能，目前仅在 Chrome 中可用，但也将会被其他浏览器支持。OffscreenCanvas 允许通过一个 web worker 去渲染画布。这是一种将繁重的工作（例如渲染复杂的 3D 场景）交给 web worker 的方法，可以避免降低浏览器的响应性，这也意味着数据是在 worker 中进行加载和解析的，因此在页面加载时可能会减少卡顿。
+
+初步的使用非常简单。让我们用 关于响应性设计的文章 中的 3 个旋转立方体作为例子。
+
+使用 worker 一般会把代码分离到其他脚本文件中，而本站上的大多数示例都将它们的脚本嵌入到它们所在页面的 HTML 文件中。
+
+在我们的例子中我们我会创建一个名为 offscreencanvas-cubes.js 的文件，并将 响应性设计示例 中的所有 JavaScript 代码复制到其中，然后做一些必要的修改使其能在 worker 中运行。
+
+在我们的 HTML 文件中还需要一些 JavaScript 代码。我们首先要做的是找到 canvas，然后调用 canvas.transferControlToOffscreen 去转移该 canvas 的控制权脱离屏幕。
+
+我们可以通过`new Worker(pathToScript, {type: 'module'})`启动 worker 并向其传递 offscreen 对象。
+
+需要注意的是 worker 不能访问 DOM。它们无法看到 HTML 元素，也无法接收鼠标事件或者键盘事件。。它们通常唯一能做的是响应发送给它们的消息，以及将消息发送回页面。
+
+要向 worker 发送消息，我们可以调用 worker.postMessage 向其传递 1 个或 2 个参数。第一个参数是一个 JavaScript 对象，会被克隆后发送给 worker。第二个参数是一个可选的对象数组，它们是在第一个参数中我们想要“转移”给 worker 的对象，这些对象不会被克隆，而是会被转移且不再存在于主页面中。不再存在这个描述可能不太准确，更确切地说是被阉割了。只有某些类型的对象可以被转移而不是克隆，其中包括 OffscreenCanvas。所以一旦被转移了，再回到主页面的 offscreen 对象也是不可用的。
+
+worker 在它们的 onmessage 处理函数中接收消息，接收到的 event.data 就是我们传递给 postMessage 的参数对象。上面的代码在传递给 worker 的对象中声明了 type: 'main'，这个对象对于浏览器没有任何意义，它完全是供我们自己使用的。我们将创建一个根据 type 去选择调用 worker 中不同函数的处理器，然后我们就可以根据需要来添加函数并从主页面轻易地调用。
+
+你可以在上面看到，我们只是根据 type 来查找对应的处理函数，并将主页面发送的 data 传递给它。
+
+所以我们现在只需要修改从 响应式设计 粘贴到 offscreencanvas-cubes.js 中的 main 函数。
+
+我们从事件数据中接收 canvas，而不是从 DOM 中查找它。
+
+请记住，worker 是无法访问 DOM 的，我们遇到的第一个问题是 resizeRendererToDisplaySize 无法获取 canvas.clientWidth 和 canvas.clientHeight，因为这些都是 DOM 的属性值。以下是原始代码。
+
+相反，我们需要在尺寸发生变化时将其发送给 worker。所以，让我们添加一些全局状态，在那里记录宽度和高度。
+
+然后让我们添加一个 size 函数用于更新这些值。
+
+现在我们可以将 resizeRendererToDisplaySize 修改为使用 state.width 和 state.height
+
+以及在计算 aspect 时我们需要做类似的修改
+
+回到主页面，只要页面改变尺寸，我们就会发送一个 size 事件。
+
+我们还会调用它一次去发送初始的尺寸
+
+只需做这几处改动
+
