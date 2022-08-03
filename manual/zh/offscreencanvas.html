@@ -150,9 +150,7 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 +sendSize();
 </pre>
 <p>我们还会直接调用它一次去发送初始的尺寸。</p>
-<p>And with just those few changes, assuming your browser fully supports <code class="notranslate" translate="no">OffscreenCanvas</code>
-it should work. Before we run it though let's check if the browser actually supports
-<code class="notranslate" translate="no">OffscreenCanvas</code> and if not display an error. First let's add some HTML to display the error.</p>
+<p>如果你的浏览器完全支持 <code class="notranslate" translate="no">OffscreenCanvas</code>，那么只需做这几处改动就能正常运行了。在运行它之前，让我们检查一下浏览器是否真的支持 <code class="notranslate" translate="no"></code>OffscreenCanvas</code>，如果不支持就显示一个错误。首先让我们添加一些 HTML 来显示这个错误。</p>
 <pre class="prettyprint showlinemods notranslate lang-html" translate="no">&lt;body&gt;
   &lt;canvas id="c"&gt;&lt;/canvas&gt;
 +  &lt;div id="noOffscreenCanvas" style="display:none;"&gt;
@@ -160,7 +158,7 @@ it should work. Before we run it though let's check if the browser actually supp
 +  &lt;/div&gt;
 &lt;/body&gt;
 </pre>
-<p>and some CSS for that</p>
+<p>以及它的 CSS 样式</p>
 <pre class="prettyprint showlinemods notranslate lang-css" translate="no">#noOffscreenCanvas {
     display: flex;
     width: 100%;
@@ -171,8 +169,7 @@ it should work. Before we run it though let's check if the browser actually supp
     color: white;
 }
 </pre>
-<p>and then we can check for the existence of <code class="notranslate" translate="no">transferControlToOffscreen</code> to see
-if the browser supports <code class="notranslate" translate="no">OffscreenCanvas</code></p>
+<p>然后我们可以检查是否存在 <code class="notranslate" translate="no">transferControlToOffscreen</code>，以确定浏览器是否支持 <code class="notranslate" translate="no">OffscreenCanvas</code></p>
 <pre class="prettyprint showlinemods notranslate lang-js" translate="no">function main() {
   const canvas = document.querySelector('#c');
 +  if (!canvas.transferControlToOffscreen) {
@@ -186,14 +183,14 @@ if the browser supports <code class="notranslate" translate="no">OffscreenCanvas
 
   ...
 </pre>
-<p>and with that, if your browser supports <code class="notranslate" translate="no">OffscreenCanvas</code> this example should work</p>
+<p>有了这个，如果你的浏览器支持 <code class="notranslate" translate="no">OffscreenCanvas</code>，那这个例子应该可以正常运行</p>
 <p></p><div translate="no" class="threejs_example_container notranslate">
   <div><iframe class="threejs_example notranslate" translate="no" style=" " src="/manual/examples/resources/editor.html?url=/manual/examples/offscreencanvas.html"></iframe></div>
-  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">click here to open in a separate window</a>
+  <a class="threejs_center" href="/manual/examples/offscreencanvas.html" target="_blank">点击这里在单独的窗口中打开</a>
 </div>
 
 <p></p>
-<p>So that's great but since not every browser supports <code class="notranslate" translate="no">OffscreenCanvas</code> at the moment
+<p>但由于目前不是每个浏览器都支持 <code class="notranslate" translate="no">OffscreenCanvas</code> at the moment
 let's change the code to work with both <code class="notranslate" translate="no">OffscreenCanvas</code> and if not then fallback to using
 the canvas in the main page like normal.</p>
 <blockquote>
